@@ -1,0 +1,83 @@
+import casa.*
+import cosas.*
+
+describe "Casa de Pepe y Julián" {
+
+    method initialize(){
+        casaDePepeYJulian.comprar(heladera)
+        casaDePepeYJulian.comprar(cama)
+        casaDePepeYJulian.comprar(plancha)
+    }
+
+    test "1er test planteado en la consigna" {
+         
+        casaDePepeYJulian.cuentaActual(cuentaConGastos)
+        casaDePepeYJulian.comprar(heladera)
+        casaDePepeYJulian.comprar(cama)
+        casaDePepeYJulian.comprar(plancha)
+
+        // La lista de las cosas compradas es heladera, cama y plancha.
+        assert.equals([heladera, cama, plancha], casaDePepeYJulian.listaDeCosas())
+
+        // Cantidad de cosas compradas es 3.
+        assert.equals(3, casaDePepeYJulian.cantidadDeCosasCompradas())
+        
+        // Tiene algún electrodoméstico.
+        assert.that(casaDePepeYJulian.tieneAlgun(electrodomestico))
+        
+        // Tiene algún mueble.
+        assert.that(casaDePepeYJulian.tieneAlgun(mueble))
+
+        // No tiene alguna comida.
+        assert.notThat(casaDePepeYJulian.tieneAlgun(comida)) 
+        
+        // Si le preguntan si viene de comprar un electrodoméstico dice que sí, pero si le preguntan si viene de comprar un mueble dice que no.
+        assert.that(casaDePepeYJulian.vieneDeComprar(electrodomestico))      
+        assert.notThat(casaDePepeYJulian.vieneDeComprar(mueble))
+        
+        // Es derrochona (ya que gastó 29200).
+        assert.that(casaDePepeYJulian.esDerrochona())
+        
+        // Los electrodomésticos compramos son la heladera y la plancha.
+        assert.equals([heladera, plancha], casaDePepeYJulian.comprados(electrodomestico))      
+        
+        // Los muebles comprados son: la cama y nada más.
+        assert.equals([cama], casaDePepeYJulian.comprados(mueble))      
+        
+        // No hay comida comprada.
+        assert.equals([], casaDePepeYJulian.comprados(comida))
+        
+        // No es una mala época.
+        assert.notThat(casaDePepeYJulian.malaEpoca())
+        
+        // Si le preguntamos que falta comprar de una tira de asado, una plancha y un paquete de fideos debe contestar que falta la tira de asado y el paquete de fideos.
+        assert.equals([tiraDeAsado, paqueteDeFideos], casaDePepeYJulian.queFaltaComprar([tiraDeAsado, plancha, paqueteDeFideos]))
+        
+        // Falta comida.
+        assert.that(casaDePepeYJulian.faltaComida())
+        
+        // Las categorías compradas son electrodoméstico y mueble.
+        assert.equals(#{electrodomestico, mueble}, casaDePepeYJulian.categoriasCompradas())
+    }
+
+    test "2do test planteado en la consigna" {
+        
+        // Si la cuenta tiene 20 de saldo, si se deposita 1000 pesos, el saldo queda en 1020 pesos, si luego se extre 50 queda en 970 pesos. Si se intenta extraer 2000 debería lanzar error ya que no se puede cumplir la responsabilidad.
+        cuentaCorriente.depositar(1000)
+        assert.equals(1020, cuentaCorriente.saldo())
+        cuentaCorriente.extraer(50)
+        assert.equals(970, cuentaCorriente.saldo())
+        assert.throwsException({cuentaCorriente.extraer(2000)})
+
+        // Para una cuenta con gastos y con un saldo de 500 pesos y 20 pesos de costo por operación, si se deposita 1000 pesos, el saldo queda en 1480 pesos. Si luego se extrae 30, queda en 1450. Después se eso se intenta depositar 2000, 
+        // pero no se puede porque violaría la regla de negocio, por lo que hay que verificar que se lance el error y que el saldo siga siendo de 1450. Finalmente se extren 2000 pesos dejando el saldo en -550.
+        cuentaConGastos.depositar(1000)
+        assert.equals(1480, cuentaConGastos.saldo())
+        cuentaConGastos.extraer(30)
+        assert.equals(1450, cuentaConGastos.saldo())
+        assert.throwsException({cuentaConGastos.depositar(2000)})
+        assert.equals(1450, cuentaConGastos.saldo())
+        cuentaConGastos.extraer(2000)
+        assert.equals(-550, cuentaConGastos.saldo())
+    }
+}
